@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "348433745307",
+    "project_id": "bettingapp-2bc17",
+    "storage_bucket": "bettingapp-2bc17.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348433745307:android:8f5bdc16ce4f73ef470d3e",
+        "android_client_info": {
+          "package_name": "com.bettingtips.org.bettingtipsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "348433745307-t5ca26pa0kji58tl6hjnuiij4qps1ntp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCecYelLBAKODCLfWoSt8P6imHqW43B_qY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "348433745307-t5ca26pa0kji58tl6hjnuiij4qps1ntp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
