@@ -1,25 +1,24 @@
-import 'package:bettingtipsapp/providers/bottomnavbarprovider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:bettingtipsapp/auth/register_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import '../widgets/login_form.dart';
 import '../widgets/sign_up_form.dart';
+import '../core/themes.dart';
+import 'login_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   static const String routeName = '/authScreen';
 
+  const AuthScreen({super.key});
+
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  AuthScreenState createState() => AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class AuthScreenState extends State<AuthScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  late AuthProvider _authProvider;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authProvider = Provider.of<AuthProvider>(context);
   }
 
 
@@ -27,7 +26,6 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      key: _scaffoldKey,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -37,30 +35,33 @@ class _AuthScreenState extends State<AuthScreen> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 100),
-                 child: Image.asset(
-                   'assets/images/logo.png',
-                   width: MediaQuery.of(context).size.width * 0.8,
-                   fit: BoxFit.cover,
+                 child: ClipRRect(
+                   borderRadius: BorderRadius.circular(20),
+                   child: Image.asset(
+                     'assets/images/logo.png',
+                     width: MediaQuery.of(context).size.width * 0.4,
+                     fit: BoxFit.cover,
+                   ),
                  ),
 
               ),
               MaterialButton(
                 onPressed: () {
-                  showLoginSheet();
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>const LoginScreen()));
                 },
-                child: Text('Login'),
                 minWidth: 250,
-                color: Colors.deepOrange,
+                color: AppTheme.themeColor,
                 textColor: Colors.white,
+                child: const Text('Login'),
               ),
               MaterialButton(
                 onPressed: () {
-                  showSignUPSheet();
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>const RegisterScreen()));
                 },
-                child: Text('Sign Up'),
                 minWidth: 250,
-                color: Colors.deepOrange,
+                color: AppTheme.themeColor,
                 textColor: Colors.white,
+                child: const Text('Sign Up'),
               ),
             ],
           ),
@@ -69,23 +70,4 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  showSignUPSheet() {
-    _scaffoldKey.currentState?.showBottomSheet(
-          (BuildContext mContext) {
-        return SignUpForm();
-      },
-      elevation: 20,
-      backgroundColor: Colors.white,
-    );
-  }
-
-  showLoginSheet() {
-    _scaffoldKey.currentState?.showBottomSheet(
-          (BuildContext mContext) {
-        return LoginForm();
-      },
-      elevation: 20,
-      backgroundColor: Colors.white,
-    );
-  }
 }

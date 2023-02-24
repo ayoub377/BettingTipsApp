@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 
-Widget  ItemTipCard(BuildContext context,data){
+Widget  itemTipCard(BuildContext context,data){
   return Container(
     margin: const EdgeInsets.all(10),
     padding: const EdgeInsets.all(10),

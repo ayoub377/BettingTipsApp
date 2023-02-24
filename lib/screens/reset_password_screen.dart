@@ -1,6 +1,7 @@
 import 'package:bettingtipsapp/providers/auth_provider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:bettingtipsapp/widgets/internet_not_connected.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     @override
   Widget build(BuildContext context) {
       return Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             gradient: LinearGradient(
                 colors: [
                   Colors.orangeAccent,
@@ -39,22 +40,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
           ),
-          body: Form(
+          body: Provider.of<InternetConnectionStatus>(context) == InternetConnectionStatus.connected ?Form(
             key: _formKey,
             child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Reset Password',
                   style: TextStyle(
                       color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: TextFormField(
@@ -70,11 +71,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   expands: false,
                   keyboardType: TextInputType.emailAddress,
                   minLines: 1,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       labelText: 'Email', hintText: 'email@email.com'),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Align(
@@ -87,15 +88,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                         await _authProvider.ResetPassword(emailController.text).then((value) => {
-                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Check your email for password reset link'))),
+                         await _authProvider.resetPassword(emailController.text).then((value) => {
+                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Check your email for password reset link'))),
                              Navigator.pop(context)
                         }).catchError((error) => {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())))
                         });
                         }
                          },
-                      child: Text('Reset Password'),
+                      child: const Text('Reset Password'),
                     ),
                   ),
                 ),
@@ -103,7 +104,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
             ],
     ),
-          ),
+          ) : const InternetNotAvailable(),
         ),
       );
    }

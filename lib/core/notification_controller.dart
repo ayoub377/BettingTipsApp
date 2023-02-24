@@ -1,21 +1,27 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 class NotificationController{
   @pragma("vm:entry-point")
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-    print('"SilentData": ${silentData.toString()}');
+
 
     if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
-      print("bg");
+
     } else {
-      print("FOREGROUND");
+      if (kDebugMode) {
+        print("FOREGROUND");
+      }
     }
 
-    print("starting long task");
-    await Future.delayed(Duration(seconds: 4));
-    print("long task done");
+    if (kDebugMode) {
+      print("starting long task");
+    }
+    await Future.delayed(const Duration(seconds: 4));
+    if (kDebugMode) {
+      print("long task done");
+    }
   }
 
   /// Use this method to detect when a new fcm token is received

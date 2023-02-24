@@ -1,21 +1,24 @@
-import 'package:bettingtipsapp/providers/bottomnavbarprovider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../screens/HomeScreen.dart';
+import '../screens/home_screen.dart';
+import '../screens/wrapper.dart';
 
 class SignUpForm extends StatefulWidget {
+  const SignUpForm({super.key});
+
   @override
-  _SignUpFormState createState() => _SignUpFormState();
+  SignUpFormState createState() => SignUpFormState();
 }
 
-class _SignUpFormState extends State<SignUpForm> {
+class SignUpFormState extends State<SignUpForm> {
+
   late AuthProvider _authProvider;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool showPassword = false;
-  BottomNavBarProvider _bottomNavBarProvider = BottomNavBarProvider();
+  bool isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -29,16 +32,28 @@ class _SignUpFormState extends State<SignUpForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 20),
-        Padding(
+        const SizedBox(height: 20),
+         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Register',
-            style: TextStyle(
-                color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+          child: Center(
+            child: SizedBox(
+              width: 180,
+              child: Text(
+                'Create new Account',
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontSize: 28.5,
+                  fontWeight: FontWeight.bold
+                )
+              ),
+            ),
           ),
         ),
-        SizedBox(height: 30),
+        Center(child: GestureDetector(
+             onTap: (){},
+            child: const Text("Already Registered? Log in here."))),
+
+        const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.all(10),
           child: TextField(
@@ -47,10 +62,19 @@ class _SignUpFormState extends State<SignUpForm> {
             maxLines: 1,
             expands: false,
             minLines: 1,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
+                labelStyle: TextStyle(color: Colors.black,fontSize: 14),
                 labelText: 'Email', hintText: 'email@email.com'),
           ),
         ),
+        (isLoading == true)?const Center(
+          child: SizedBox(
+            height: 40,
+            child:CircularProgressIndicator(
+              color: Color(0xff405cbf),
+            ),
+          ),
+        ):Container(),
         Padding(
           padding: const EdgeInsets.all(10),
           child: TextField(
@@ -61,6 +85,7 @@ class _SignUpFormState extends State<SignUpForm> {
             obscureText: !showPassword,
             minLines: 1,
             decoration: InputDecoration(
+              labelStyle: const TextStyle(color: Colors.black,fontSize: 14),
                 labelText: 'Password',
                 hintText: 'password',
                 suffix: IconButton(
@@ -73,30 +98,38 @@ class _SignUpFormState extends State<SignUpForm> {
                     })),
           ),
         ),
-        SizedBox(height: 30),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(32.0),
+        const SizedBox(height: 30),
+        Center(
+          child: SizedBox(
+            width: 200,
+            child: ElevatedButton(
+              style: const ButtonStyle(
+                 backgroundColor: MaterialStatePropertyAll<Color>(Colors.black)
+              ),
+              onPressed:  () async {
+                setState(() {
+                  isLoading = true;
+                });
+                try{
+                  await _authProvider.registerWithEmailAndPassword(
+                      emailController.text, passwordController.text).whenComplete((){
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute (builder: (BuildContext context) => const MainScreen()), (route) => false);
+                  });
+                }
+                catch(e)
+                {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("there is some problem try again"),));
+                }
+              },
+              child: const Center(child: Text('Continue')),
             ),
           ),
-          onPressed:  () async {
-            var result = await _authProvider.registerWithEmailAndPassword(
-                emailController.text, passwordController.text);
-            if (result is bool && result) {
-              _bottomNavBarProvider.changeIndex(0);
-              Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-            }
-            else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(result.toString()),
-              ));
-            }
-
-          },
-          child: Center(child: Text('Continue')),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }

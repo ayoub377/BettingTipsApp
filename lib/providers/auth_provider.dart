@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -9,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   late String userId;
-  late String error_message;
+  late String errorMessage;
   final storageRef = FirebaseStorage.instance.ref();
 
 
@@ -26,10 +25,12 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } on PlatformException catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
       notifyListeners();
       String message = error.code;
-      if(error.code == 'ERROR_USER_NOT_FOUND'){
+      if(message == 'ERROR_USER_NOT_FOUND'){
         message = 'User Not Found';
       }else if(error.code == 'ERROR_WRONG_PASSWORD'){
         message = 'Wrong Password';
@@ -42,9 +43,8 @@ class AuthProvider with ChangeNotifier {
   Future<dynamic> registerWithEmailAndPassword(
       String email, String password) async {
     try {
-
       notifyListeners();
-      final result = await auth.createUserWithEmailAndPassword(
+      await auth.createUserWithEmailAndPassword(
           email: email, password: password).then((value) async {
         FirebaseFirestore.instance.collection('Users')
             .doc(value.user?.uid)
@@ -56,14 +56,14 @@ class AuthProvider with ChangeNotifier {
           'isSubscribed':false
         });
       });
-
       notifyListeners();
       return true;
     } on PlatformException catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
 
       notifyListeners();
-      String message = error.code;
     }
   }
 
@@ -74,24 +74,27 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return await auth.signOut();
     } catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
       return null;
     }
   }
 
-Future ResetPassword(String email) async {
+Future resetPassword(String email) async {
     try {
       await auth.sendPasswordResetEmail(email: email);
       notifyListeners();
       return true;
     } on PlatformException catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
       notifyListeners();
-      String message = error.code;
     }
   }
 
-  Future<void> updateProfile(String name, String email, String image) async {
+  Future<void> updateProfile(String name, String email, String? image) async {
     User? user = auth.currentUser;
     user!.updateDisplayName(name);
     user.updateEmail(email);
@@ -105,10 +108,10 @@ Future ResetPassword(String email) async {
     });
   }
 
-  Future<String> Get_CurrentUser_infos() async {
+  Future<String> getCurrentUserInfos() async {
     User? user = auth.currentUser;
-    var user_infos = await FirebaseFirestore.instance.collection('Users').where("uid", isEqualTo:user!.uid).get();
-    return user_infos.docs.first['image'];
+    var userInfos = await FirebaseFirestore.instance.collection('Users').where("uid", isEqualTo:user!.uid).get();
+    return userInfos.docs.first['image'];
   }
 
 }

@@ -9,7 +9,10 @@ class Item {
   String? league;
   String? prediction;
   String? odd;
+  String? iswon;
+  String? probability;
   String? type;
+  String? dateString;
   Item(
       {this.home,
         this.away,
@@ -18,7 +21,10 @@ class Item {
         this.league,
         this.prediction,
         this.odd,
-        this.type});
+        this.type,
+      this.iswon,
+      this.probability,
+      this.dateString});
 
   Item.fromJson(Map<String, dynamic> json) {
     home = json['home'];
@@ -29,18 +35,24 @@ class Item {
     prediction = json['prediction'];
     odd = json['odd'];
     type = json['type'];
+    iswon = json['iswon'];
+    probability = json['probability'];
+    dateString = json['dateString'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['home'] = this.home;
-    data['away'] = this.away;
-    data['date'] = this.date;
-    data['time'] = this.time;
-    data['league'] = this.league;
-    data['predicton'] = this.prediction;
-    data['odd'] = this.odd;
-    data['type'] = this.type;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['home'] = home;
+    data['away'] = away;
+    data['date'] = date;
+    data['time'] = time;
+    data['league'] = league;
+    data['predicton'] = prediction;
+    data['odd'] = odd;
+    data['type'] = type;
+    data['iswon'] = iswon;
+    data['probability'] = probability;
+    data['dateString'] = dateString;
     return data;
   }
 }
