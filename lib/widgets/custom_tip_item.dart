@@ -1,6 +1,5 @@
 import 'package:bettingtipsapp/model/item_tip.dart';
 import 'package:bettingtipsapp/screens/tips_details_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 

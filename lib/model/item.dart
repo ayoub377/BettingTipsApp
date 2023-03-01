@@ -4,7 +4,7 @@
 class Item {
   String? home;
   String? away;
-  String? date;
+  DateTime? date;
   String? time;
   String? league;
   String? prediction;
@@ -29,7 +29,7 @@ class Item {
   Item.fromJson(Map<String, dynamic> json) {
     home = json['home'];
     away = json['away'];
-    date = json['date'];
+    date = json['date'].toDate();
     time = json['time'];
     league = json['league'];
     prediction = json['prediction'];

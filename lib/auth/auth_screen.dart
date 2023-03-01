@@ -1,7 +1,5 @@
 import 'package:bettingtipsapp/auth/register_screen.dart';
 import 'package:flutter/material.dart';
-import '../widgets/login_form.dart';
-import '../widgets/sign_up_form.dart';
 import '../core/themes.dart';
 import 'login_screen.dart';
 
@@ -15,7 +13,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class AuthScreenState extends State<AuthScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

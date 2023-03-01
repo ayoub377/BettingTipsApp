@@ -14,9 +14,12 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'core/notifications.dart';
 import 'auth/login_screen.dart';
 import 'auth/register_screen.dart';
+import 'core/constants.dart';
+import 'dart:io';
 
 
 @pragma('vm:entry-point')
@@ -36,10 +39,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+Future<void> initPlatformState() async {
+  await Purchases.setLogLevel(LogLevel.debug);
+
+  late PurchasesConfiguration configuration;
+  if (Platform.isAndroid) {
+    configuration = PurchasesConfiguration(googleApiKey);
+  } else if (Platform.isIOS) {
+    configuration = PurchasesConfiguration(appleApiKey);
+  }
+  await Purchases.configure(configuration);
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await MobileAds.instance.initialize();
+  await initPlatformState();
   runApp(const MyApp());
 }
 

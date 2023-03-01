@@ -42,9 +42,10 @@ class RegisterScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(40),
         ),
+
         child: Column(
-        children: [
-        const Padding(
+        children: const [
+        Padding(
         padding: EdgeInsets.only(top: 30),
         child: SignUpForm(),
         ),

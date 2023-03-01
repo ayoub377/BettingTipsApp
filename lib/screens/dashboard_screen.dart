@@ -175,11 +175,11 @@ class _DashboradState extends State<Dashboard> {
                  builder: (context,AsyncSnapshot<List<Bet>> snapshot) {
                    double profitLoss = 0;
                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                     snapshot.data!.forEach((bet) {
+                     for (var bet in snapshot.data!) {
                          if (bet.payout!.isNotEmpty) {
                            profitLoss += double.parse(bet.payout!) - double.parse(bet.amount!) ;
                          }
-                     });
+                     }
                     return Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
@@ -210,7 +210,7 @@ class _DashboradState extends State<Dashboard> {
                                           if (flSpot.x != 0 && flSpot.y != 0) {
                                             return LineTooltipItem(
                                               "Day:${flSpot.x.toInt()}\n Amount:${flSpot.y}",
-                                              TextStyle(color: Colors.yellow),
+                                              const TextStyle(color: Colors.yellow),
                                             );
                                           }
                                           return null;

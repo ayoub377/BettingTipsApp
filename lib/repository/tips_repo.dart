@@ -2,7 +2,6 @@ import 'package:bettingtipsapp/model/item_tip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../model/bet.dart';
 import '../model/item.dart';
 
@@ -21,7 +20,8 @@ class TipsRepo {
     QuerySnapshot snapshot = await _db.collection('bets').get();
     return snapshot.docs.map((doc) => Bet.fromJson(doc.data() as Map<String, dynamic> )).toList();
   }
-    Future<List<Bet>> getMonthBetData(int month) async {
+
+  Future<List<Bet>> getMonthBetData(int month) async {
       QuerySnapshot snapshot = await _db
           .collection("bets")
           .where("date", isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(DateTime.now().year, month, 1)))
@@ -29,6 +29,7 @@ class TipsRepo {
           .get();
     return snapshot.docs.map((doc) => Bet.fromJson(doc.data() as Map<String, dynamic> )).toList();
   }
+
   Future<double> getMonthProfitLoss(int month) async {
     List<Bet> bets;
     double profitLossCalc=0;

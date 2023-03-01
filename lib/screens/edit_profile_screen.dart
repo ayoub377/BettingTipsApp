@@ -248,6 +248,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
                     ),
                   ),
                   const SizedBox(height: 20,),
+                  const Text("Subscription status:"),
+                  const SizedBox(height: 5,),
+                  const Text("Non subscribed"),
+                  const SizedBox(height: 20,),
                   const Center(child: Text("Your Bet tracking History",style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18

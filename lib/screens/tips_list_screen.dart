@@ -4,11 +4,13 @@ import 'package:bettingtipsapp/screens/wrapper.dart';
 import 'package:bettingtipsapp/widgets/internet_not_connected.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import '../core/paywall.dart';
 import '../core/themes.dart';
 import '../model/bet.dart';
 import '../model/item_tip.dart';
@@ -27,18 +29,40 @@ class _TipsScreenState extends State<TipsScreen> {
   TipsRepo tipsRepo = TipsRepo();
   bool? isBet=false;
   TextEditingController amount = TextEditingController();
+  late Future<bool> _isSubscribedFuture;
   String? uid = FirebaseAuth.instance.currentUser?.uid;
+  bool? _isSubscribed;
+  int? index;
 
   @override
   void initState() {
     super.initState();
+    _isSubscribedFuture = _fetchIsSubscribed();
+  }
+
+  Future<bool> _fetchIsSubscribed() async {
+    final doc = await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser?.uid).get();
+    print(doc.data());
+    if (doc.exists) {
+      if(doc['isSubscribed'] == true){
+        _isSubscribed = true;
+        setState(() {
+          _isSubscribed = true;
+        });
+      }
+      return doc['isSubscribed'];
+    }
+    else{
+      _isSubscribed = true;
+      return false;
+    }
   }
 
   Widget betTrackerField({Timestamp? date, String? totalOdd, String? uid}){
     return Column(
       children: [
         CheckboxListTile(
-            title: Text("Are you betting on this Ticket?"),
+            title: const Text("Are you betting on this Ticket?"),
             value: isBet, onChanged: (value){
           setState(() {
             isBet = value;
@@ -72,13 +96,61 @@ class _TipsScreenState extends State<TipsScreen> {
              builder: (BuildContext context) => const MainScreen(),
            ),);
            }
-        } : null , child: Text("Track this bet!",style: TextStyle(
-    fontSize: 18,fontWeight: FontWeight.bold
-    ),),style: ButtonStyle(
+        } : null ,style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(AppTheme.themeColor)
-        ),)
+        ), child: const Text("Track this bet!",style: TextStyle(
+    fontSize: 18,fontWeight: FontWeight.bold
+    ),),)
       ],
     );
+  }
+
+  void perfomMagic() async {
+    CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+
+    if (customerInfo.entitlements.all['premium'] != null &&
+        customerInfo.entitlements.all['premium']!.isActive == true) {
+      setState(() {
+        _isSubscribed = true;
+      });
+    } else {
+      Offerings? offerings;
+      try {
+        offerings = await Purchases.getOfferings();
+      } on PlatformException catch (e) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                title: const Text("Error"), content: Text(e.message!),actions: [
+                  ElevatedButton(onPressed: (){
+                    Navigator.pop(context);
+                  }, child: const Text("dismiss"))
+            ],));
+      }
+
+      if (offerings!.current == null) {
+        // offerings are empty, show a message to your user
+      } else {
+        // current offering is available, show paywall
+        await showModalBottomSheet(
+          useRootNavigator: true,
+          isDismissible: true,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+                  return Paywall(
+                    offering: offerings!.current!,
+                  );
+                });
+          },
+        );
+      }
+    }
   }
 
 
@@ -89,21 +161,41 @@ class _TipsScreenState extends State<TipsScreen> {
         length: 2,
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(100),
-            child: AppBar(
-              backgroundColor: AppTheme.themeColor,
-              elevation: 0,
-              title: const Center(child: const Text('Today Tips', style: TextStyle(color: Colors.white),)),
-              bottom: const TabBar(
-                indicatorColor: Colors.deepOrange,
-                labelColor: Colors.white,
-                tabs: [
-                  Tab(text: 'Accumulator',icon: Icon(Icons.sports_soccer_rounded,color: Colors.white,),),
-                  Tab(text: 'General picks', icon: Icon(Icons.tips_and_updates_rounded,color: Colors.white),),
-                ],
-              ),
-            ),
+          appBar: AppBar(
+            backgroundColor: AppTheme.themeColor,
+            elevation: 0,
+            title: const Center(child: Text('Today Tips', style: TextStyle(color: Colors.white),)),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: FutureBuilder<bool>(
+                  future: _isSubscribedFuture,
+                  builder: (context,snapshot){
+                    if(snapshot.hasData && snapshot.data!){
+                      return TabBar(
+                          onTap: (index){
+                            print('okk');
+                          },
+                          indicatorColor: Colors.deepOrange,
+                          labelColor: Colors.white,
+                          tabs: const [
+                            Tab(text: 'Accumulator',icon: Icon(Icons.sports_soccer_rounded,color: Colors.white,),),
+                            Tab(text: 'premium picks', icon:Icon(Icons.tips_and_updates_rounded))
+                          ],
+                      );
+                    }
+                    else if(snapshot.hasData && snapshot.data == false){
+                     return const TabBar(
+                        indicatorColor: Colors.deepOrange,
+                        labelColor: Colors.white,
+                        tabs: [
+                          Tab(text: 'Accumulator',icon: Icon(Icons.sports_soccer_rounded,color: Colors.white,),),
+                          Tab(text: 'premium picks', icon:Icon(Icons.lock))
+                        ],
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  })
+            )
           ),
           body: Provider.of<InternetConnectionStatus>(context) == InternetConnectionStatus.connected ? Container(
                 height: MediaQuery.of(context).size.height,
@@ -151,14 +243,14 @@ class _TipsScreenState extends State<TipsScreen> {
                         }
                       },
                     ),
+                    _isSubscribed == true ?
                     FutureBuilder(
-                      future: tipsRepo.getPicks(),
+                      future: tipsRepo.getGeneralTodayTips(),
                       builder: (context,AsyncSnapshot<List<Item>> snapshot)
                       {
                         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                           return ListView.builder(
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
                               itemCount: snapshot.data!.length,
                               itemBuilder:(context, index) {
                                 return buildTips(snapshot.data![index], index);
@@ -178,7 +270,14 @@ class _TipsScreenState extends State<TipsScreen> {
                         }
                         return const Text("load");
                       },
-                    ),
+                    ):
+               InkWell(
+                  onTap: ()=>perfomMagic(),
+                 child: const ListTile(
+              title: Text("Premium Tip"),
+          subtitle: Text("Subscribe to see this tip!"),
+        ),
+               ),
                   ]),
                 ),
               ) : const InternetNotAvailable(),
@@ -206,7 +305,7 @@ class _TipsScreenState extends State<TipsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(snapshot.date ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              Text(snapshot.dateString ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
             ],
           ),
           Row(
@@ -243,17 +342,12 @@ class _TipsScreenState extends State<TipsScreen> {
                     ],
                   ),
                 ),
-                Padding(
+                if(snapshot.probability!= null)
+                  Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 0, 10),
                   child: Row(
                     children: [
-                      if(snapshot.probability!.isNotEmpty)
                          Text("probability: ${snapshot.probability?.toString() ?? ''}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                      const SizedBox(width: 20,),
-                      (snapshot.iswon == "true") ?
-                        Text("Won", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15,color: Colors.green),):
-                        Text("Lost", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15,color: Colors.red),)
-
                     ],
                   ),
                 ),
@@ -264,5 +358,6 @@ class _TipsScreenState extends State<TipsScreen> {
       ),
     );
   }
+
 }
 

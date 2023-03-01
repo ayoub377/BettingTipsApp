@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../screens/home_screen.dart';
 import '../screens/wrapper.dart';
 
 class SignUpForm extends StatefulWidget {
@@ -122,7 +121,7 @@ class SignUpFormState extends State<SignUpForm> {
                     isLoading = false;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("there is some problem try again"),));
+                  const SnackBar(content: Text("there is some problem try again"),));
                 }
               },
               child: const Center(child: Text('Continue')),

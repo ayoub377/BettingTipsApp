@@ -80,7 +80,7 @@ class _TipDetailsState extends State<TipDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(snapshot.item?[index].date ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              Text(snapshot.item?[index].date.toString() ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
             ],
           ),
           Row(

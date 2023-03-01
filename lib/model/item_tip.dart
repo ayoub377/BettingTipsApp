@@ -1,8 +1,6 @@
 import 'package:bettingtipsapp/model/item.dart';
 
 
-
-
 class ItemTip {
   List<Item>? item;
   DateTime? date;

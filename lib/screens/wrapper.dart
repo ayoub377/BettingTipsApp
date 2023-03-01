@@ -8,7 +8,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../core/ad_helper.dart';
 import '../core/in_app_reviews.dart';
 import 'home_screen.dart';
-import 'package:flutter/cupertino.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -26,10 +25,10 @@ class _MainScreenState extends State<MainScreen> {
   InterstitialAd? _interstitialListTipsAd;
   int _selectedIndex = 0;
   final AuthProvider _authProvider = AuthProvider();
-  static List<Widget> _widgetOptions =  <Widget>[
-    HomeScreen(),
-    TipsScreen(),
-    EditProfileScreen()
+  static final List<Widget> _widgetOptions =  <Widget>[
+    const HomeScreen(),
+    const TipsScreen(),
+    const EditProfileScreen()
   ];
   void _onItemTapped(int index) {
     setState(() {

@@ -28,7 +28,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final TipsRepo _repo = TipsRepo();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
    InterstitialAd? _interstitialDetailsTipsAd;
 
 
@@ -57,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return
       DefaultTabController(
-
         length: 2,
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -69,11 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
     child:  Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: <Widget>[
+    children: const <Widget>[
      Padding(
-    padding: const EdgeInsets.only(left: 15.0),
+    padding: EdgeInsets.only(left: 15.0),
     child: Text(
-      'History of Tips',style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+      'History of Tips',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
     ),
     ),
     ],
@@ -126,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           if (snapshot.connectionState == ConnectionState.done && snapshot.data!.isEmpty)
                           {
-                            return const Text("Still empty Data");
+                            return const Text("empty Data");
                           }
                           else if(snapshot.connectionState == ConnectionState.waiting){
                             return const Center(
@@ -137,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                     ),
                     FutureBuilder(
-                        future: _repo.getGeneralTodayTips(),
+                        future: _repo.getPicks(),
                         builder: (BuildContext context, AsyncSnapshot<List<Item>> snapshot)
                         {
                           if (snapshot.connectionState == ConnectionState.done) {
@@ -249,17 +247,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),),
             Padding(
               padding: const EdgeInsets.only(top: 10, bottom: 10),
-              child: Text('${pick.home} vs ${pick.away}',style: TextStyle(
+              child: Text('${pick.home} vs ${pick.away}',style: const TextStyle(
                 fontWeight: FontWeight.w700
               ),),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                 Text("odd: ${pick.odd}",style:TextStyle(
+                 Text("odd: ${pick.odd}",style:const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,)),
-                 Text("${pick.prediction}",style:TextStyle(
+                 Text("${pick.prediction}",style:const TextStyle(
                    fontSize: 16,
                    fontWeight: FontWeight.w500,)),
               ],
